@@ -1,0 +1,152 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+
+
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">Dependencias</h2>
+
+    <!-- Alerta de error -->
+    @if (error()) {
+    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+      {{ error() }}
+    </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="bg-white rounded-xl shadow p-6 mb-6">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        {{ editId() ? 'Editar Dependencia' : 'Nueva Dependencia' }}
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <input formControlName="nombre" placeholder="Nombre *"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+          <p class="text-red-500 text-xs mt-1">Nombre requerido (mín. 3 caracteres)</p>
+          }
+        </div>
+        <div>
+          <input formControlName="direccion" placeholder="Dirección"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <input formControlName="telefono" placeholder="Teléfono"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <input formControlName="correo" placeholder="Correo *"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          @if (form.get('correo')?.invalid && form.get('correo')?.touched) {
+          <p class="text-red-500 text-xs mt-1">Correo inválido</p>
+          }
+        </div>
+      </div>
+      <div class="flex gap-2 mt-4">
+        <button type="submit" [disabled]="form.invalid"
+          class="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+          {{ editId() ? 'Actualizar' : 'Crear' }}
+        </button>
+        @if (editId()) {
+        <button type="button" (click)="reset()"
+          class="px-5 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition">
+          Cancelar
+        </button>
+        }
+      </div>
+    </form>
+
+    <!-- Filtros -->
+    <div class="flex gap-3 mb-4">
+      <!-- Nombre -->
+      <input placeholder="Buscar por nombre..." [value]="search()"
+        (input)="search.set($any($event.target).value); setPage(0)"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+      <!-- Correo -->
+      <input placeholder="Buscar por correo..." [value]="correoFilter()"
+        (input)="correoFilter.set($any($event.target).value); setPage(0)"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+      <!-- Estado -->
+      <select
+        (change)="activoFilter.set($any($event.target).value === '' ? null : $any($event.target).value === 'true'); setPage(0)"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+    </div>
+
+    <!-- Tabla -->
+    @if (data()) {
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="px-4 py-3 text-left font-medium">ID</th>
+            <th class="px-4 py-3 text-left font-medium">Nombre</th>
+            <th class="px-4 py-3 text-left font-medium">Dirección</th>
+            <th class="px-4 py-3 text-left font-medium">Teléfono</th>
+            <th class="px-4 py-3 text-left font-medium">Correo</th>
+            <th class="px-4 py-3 text-left font-medium">Estado</th>
+            <th class="px-4 py-3 text-left font-medium">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (dep of data().content; track dep.id) {
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-3 text-gray-500">{{ dep.id }}</td>
+            <td class="px-4 py-3 font-medium text-gray-800">{{ dep.nombre }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ dep.direccion }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ dep.telefono }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ dep.correo }}</td>
+            <td class="px-4 py-3">
+              <span [class]="dep.activo
+                    ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold'
+                    : 'bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold'">
+                {{ dep.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex gap-2">
+                <button (click)="edit(dep)"
+                  class="cursor-pointer px-3 py-1 bg-yellow-400 text-white text-xs rounded hover:bg-yellow-500 transition">
+                  Editar
+                </button>
+                <button (click)="toggle(dep.id)"
+                  class="cursor-pointer px-3 py-1 text-white text-xs rounded
+                  {{ dep.activo ? 'bg-sky-500 hover:bg-sky-600 transition' : 'bg-green-500 hover:bg-green-600 transition' }}">
+                  {{ dep.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+                <button (click)="delete(dep.id)"
+                  class="cursor-pointer px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginacion -->
+    <div class="flex items-center gap-3 mt-4">
+      <button [disabled]="page() === 0" (click)="setPage(page() - 1)"
+        class="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+        ‹ Anterior
+      </button>
+      <span class="text-sm text-gray-600">
+        Página <strong>{{ page() + 1 }}</strong> de <strong>{{ data().totalPages }}</strong>
+      </span>
+      <button [disabled]="page() + 1 >= data().totalPages" (click)="setPage(page() + 1)"
+        class="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+        Siguiente ›
+      </button>
+    </div>
+
+    } @else {
+    <p class="text-gray-400 text-sm">Cargando...</p>
+    }
+
+  </div>
+</div>
