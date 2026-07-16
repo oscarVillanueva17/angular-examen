@@ -7,11 +7,16 @@ import { Dependencia, PageResponse } from '../models/dependencia.model';
 export class DependenciaService {
     private http = inject(HttpClient);
     private url = 'http://localhost:8080/api/dependencias';
+    private urlDependenciasConteo = 'http://localhost:8080/api/dependencias/total'
 
     listar(filters: any, page = 0, size = 10): Observable<PageResponse<Dependencia>> {
         let params = new HttpParams().set('page', page).set('size', size);
         Object.entries(filters).forEach(([k, v]) => v != null && v !== '' && (params = params.set(k, String(v))));
         return this.http.get<PageResponse<Dependencia>>(this.url, { params });
+    }
+
+    obtenerTotales(): Observable<{ activas: number, inactivas: number }> {
+        return this.http.get<{ activas: number, inactivas: number }>(this.urlDependenciasConteo);
     }
 
     crear(d: Dependencia) { return this.http.post<Dependencia>(this.url, d); }

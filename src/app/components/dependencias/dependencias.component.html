@@ -39,6 +39,25 @@
           <p class="text-red-500 text-xs mt-1">Correo inválido</p>
           }
         </div>
+        <div>
+          <input formControlName="responsable" placeholder="Responsable"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <select formControlName="municipio"
+            class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="Municipio 1">Municipio 1</option>
+            <option value="Municipio 2">Municipio 2</option>
+            <option value="Municipio 3">Municipio 3</option>
+            <option value="Municipio 4">Municipio 4</option>
+            <option value="Municipio 5">Municipio 5</option>
+            <option value="Municipio 6">Municipio 6</option>
+            <option value="Municipio 7">Municipio 7</option>
+            <option value="Municipio 8">Municipio 8</option>
+            <option value="Municipio 9">Municipio 9</option>
+            <option value="Municipio 10">Municipio 10</option>
+          </select>
+        </div>
       </div>
       <div class="flex gap-2 mt-4">
         <button type="submit" [disabled]="form.invalid"
@@ -66,6 +85,11 @@
         (input)="correoFilter.set($any($event.target).value); setPage(0)"
         class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
+      <input type="date" [value]="fechaInicioFilter()"
+        (input)="fechaInicioFilter.set($any($event.target).value); setPage(0)"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="date" [value]="fechaFinFilter()" (input)="fechaFinFilter.set($any($event.target).value); setPage(0)"
+        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       <!-- Estado -->
       <select
         (change)="activoFilter.set($any($event.target).value === '' ? null : $any($event.target).value === 'true'); setPage(0)"
@@ -76,6 +100,15 @@
       </select>
     </div>
 
+    <div>
+      <span>Total de dependencias activas: </span>
+      <span class="">{{dependenciasActivas()}}</span>
+    </div>
+    <div>
+      <span>Total de dependencias inactivas: </span>
+      <span> {{dependenciasInactivas()}} </span>
+    </div>
+
     <!-- Tabla -->
     @if (data()) {
     <div class="bg-white rounded-xl shadow overflow-hidden">
@@ -83,6 +116,9 @@
         <thead class="bg-gray-800 text-white">
           <tr>
             <th class="px-4 py-3 text-left font-medium">ID</th>
+            <th class="px-4 py-3 text-left font-medium">Fecha de registro</th>
+            <th class="px-4 py-3 text-left font-medium">Responsable</th>
+            <th class="px-4 py-3 text-left font-medium">Municipio</th>
             <th class="px-4 py-3 text-left font-medium">Nombre</th>
             <th class="px-4 py-3 text-left font-medium">Dirección</th>
             <th class="px-4 py-3 text-left font-medium">Teléfono</th>
@@ -95,6 +131,10 @@
           @for (dep of data().content; track dep.id) {
           <tr class="hover:bg-gray-50 transition">
             <td class="px-4 py-3 text-gray-500">{{ dep.id }}</td>
+            <td class="px-4 py-3 font-medium text-gray-800">{{ dep.fechaRegistro | date: 'dd/MM/yyyy HH:mm:ss' }}
+            </td>
+            <td class="px-4 py-3 font-medium text-gray-800">{{ dep.responsable ? dep.responsable : 'N/A' }}</td>
+            <td class="px-4 py-3 font-medium text-gray-800">{{ dep.municipio ? dep.municipio : 'N/A' }}</td>
             <td class="px-4 py-3 font-medium text-gray-800">{{ dep.nombre }}</td>
             <td class="px-4 py-3 text-gray-600">{{ dep.direccion }}</td>
             <td class="px-4 py-3 text-gray-600">{{ dep.telefono }}</td>

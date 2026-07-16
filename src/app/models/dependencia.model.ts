@@ -7,6 +7,8 @@ export interface Dependencia {
     activo?: boolean;
     fechaRegistro?: string;
     fechaActualizacion?: string;
+    responsable: string;
+    municipio: string;
 }
 
 export interface PageResponse<T> {
